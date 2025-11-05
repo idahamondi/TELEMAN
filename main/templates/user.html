@@ -1,0 +1,30 @@
+{% block content %}
+{% load static %}
+{% if data %}
+
+<div class="p-2 md:p-3 pr-8 mb-2 bg-white w-max rounded-lg shadow-md">
+    <div class="flex justify-between items-center gap-x-3">
+        <div class="pr-12">
+            <div class="flex items-center gap-x-3">
+                <img
+                    class="w-12 rounded-full"
+                    src="{% static 'images/user_icon.png' %}"
+                alt="Avatar" />
+                <div class="grow">
+                    <h3
+                        class="font-bold text-gray-800 text-sm">
+                        {{ data.first_name }}
+                        {{ data.last_name }}
+                    </h3>
+                    <h3
+                        class="font-semibold text-gray-800 text-sm">
+                        {{ data.username }}
+                    </h3>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endif %}
+{% endblock content %}

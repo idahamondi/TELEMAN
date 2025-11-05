@@ -1,0 +1,239 @@
+{% extends '../base.html' %} 
+{% block content %}
+{% load static %}
+
+<input type="hidden" name="session-username" id="session-username" value="{{user}}"/>
+
+<nav
+    class="flex px-5 py-3 -mt-16 md:-mt-10 mb-2 text-gray-700 border border-gray-200 rounded-lg bg-gray-50 dark:bg-gray-800 dark:border-gray-700 mr-16 lg:mr-24 z-5"
+    aria-label="Menu">
+    <ol
+        class="inline-flex items-center space-x-1 md:space-x-2 rtl:space-x-reverse">
+		<li class="inline-flex items-center">
+            <a
+                href="/"
+                class="items-center flex justify-center text-sm font-medium text-gray-700 hover:text-blue-600 dark:text-gray-400 dark:hover:text-white">
+				<img class="w-6 h-auto inline"
+					src="{% static 'images/teleman_icon.png' %}"
+					alt="TELEMAN" />
+                <span class="ml-1 text-md font-bold">TELEMAN</span>
+            </a>
+        </li>
+        <li class="inline-flex items-center">
+            <a
+                href="/dashboard/"
+                class="items-center text-sm font-medium text-gray-700 hover:text-blue-600 dark:text-gray-400 dark:hover:text-white">
+                <i class="fas fa-home"></i>
+                Dashboard
+            </a>
+        </li>
+        <li aria-current="page">
+            <div class="flex items-center">
+				<i class="fas fa-angle-right"></i>
+                <span
+                    class="ms-1 ml-2 text-sm font-medium text-gray-500 md:ms-2 dark:text-gray-400"
+                    >Network</span
+                >
+            </div>
+        </li>
+    </ol>
+</nav>
+
+{% if user.is_authenticated %}
+    {% load user %} {% user user %}
+{% endif %}
+
+<div class="container max-w-8xl mx-auto">
+    <h1 class="text-2xl font-bold text-center mb-4 my-4 text-xl font-extrabold text-gray-900 md:text-2xl lg:text-3xl">NETWORK STATUS</h1>
+    {% if devices %}
+    {% for location, device_list in devices.items %}
+
+        <h3 class="my-4 text-xl font-extrabold text-gray-900 md:text-2xl lg:text-3xl text-capitalize">
+            <span class="text-capitalize text-transparent bg-clip-text bg-gradient-to-r to-green-500 from-blue-400">
+            {{location}}</span> Network
+        </h3>
+        <div
+            class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 px-4 md:px-2 lg:px-0">
+            {% for device in device_list %}
+
+            <div id="crud-modal-{{device.component_id}}" tabindex="-1" class="hidden crud-modal-form overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+                {% csrf_token %}
+                <div class="relative p-4 w-full max-w-md max-h-full">
+                    <div class="relative bg-white p-4 rounded-lg shadow dark:bg-gray-700">
+                        <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                                Report Fault
+                            </h3>
+                            <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-toggle="crud-modal-{{device.component_id}}">
+                                <svg class="w-3 h-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                                </svg>
+                                <span class="sr-only">Close modal</span>
+                            </button>
+                        </div>
+                        <div class="p-4 md:p-5">
+                            <div class="grid gap-4 mb-4 grid-cols-2 fault-report-form">
+                                <div class="col-span-2 component-block">
+                                    <input required type="text" value="{{device.component_id}}" name="component_id" disabled class="component_id_val bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="Device ID" required="">
+                                </div>
+                                <div class="col-span-2 sm:col-span-1 priority-block">
+                                    <label for="priority-level" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Priority Level</label>
+                                    <select required id="priority-level" name="priority_level" class="priority_val bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
+                                        <option value="high">High</option>
+                                        <option value="medium">Medium</option>
+                                        <option value="low">Low</option>
+                                    </select>
+                                </div>
+                                {% load display_technicians %}
+                                {% display_technicians device.type %}
+                                <div class="col-span-2 description-block">
+                                    <label for="description" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Fault Description</label>
+                                    <textarea id="description" rows="4" class="description_val block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Write the description of the fault here"></textarea>                    
+                                </div>
+                            </div>
+                            <input type="hidden" name="device_id" value="{{device.component_id}}">
+                            <input type="hidden" name="device_type" value="{{device.type}}">
+                            <input type="hidden" name="user" value="{{user}}">
+                            <button type="submit" class="submit-fault-report text-white inline-flex items-center bg-yellow-700 hover:bg-yellow-800 focus:ring-4 focus:outline-none focus:ring-yellow-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">
+                                <i class="fa fa-warning mr-2"></i>
+                                <span>Report Fault</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="styled-{{location}}"
+                class="shadow-lg rounded-xl bg-white w-full w-auto p-6 relative overflow-hidden">
+                <p class="text-gray-500 text-xl">{{device.component_id}}</p>
+                <div
+                    class="flex items-center my-4 text-blue-500 rounded justify-between">
+                    <span
+                        class="rounded-lg p-2 bg-white w-8 h-8 flex align-center content-center">
+                        <i class="fa fa-calendar"></i>
+                    </span>
+                    <div
+                        class="flex flex-col w-full ml-2 items-start justify-evenly">
+                        <p class="text-gray-500 text-lg">
+                            Type: <strong>{{device.type}}</strong>
+                        </p>
+                    </div>
+                </div>
+                <div
+                    class="flex items-center my-4 text-blue-500 rounded justify-between">
+                    <span
+                        class="rounded-lg p-2 bg-white w-8 h-8 flex align-center content-center">
+                        <i class="fa fa-calendar"></i>
+                    </span>
+                    <div
+                        class="flex flex-col w-full ml-2 items-start justify-evenly">
+                        <p class="text-gray-500 text-lg">
+                            Manufacturer: <strong>{{device.manufacturer}}</strong>
+                        </p>
+                    </div>
+                </div>
+                <div
+                    class="flex items-center text-blue-500 rounded justify-between">
+                    <span
+                        class="rounded-lg p-2 bg-white w-8 h-8 flex align-center content-center">
+                        <i class="fa fa-window-close"></i>
+                    </span>
+                    <div
+                        class="flex flex-col w-full ml-2 items-start justify-evenly">
+                        <p class="text-gray-500 text-lg">
+                            Location: <strong>{{device.location}}</strong>
+                        </p>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    {% if device.status %}
+                        {% if user_type != "admin" %}
+                            <div class="flex items-start justify-between">
+                                <span class="bg-green-100 mr-2 inline text-green-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded dark:bg-gray-700 dark:text-green-400 border border-green-400">Device Online</span>
+                                <button data-modal-target="crud-modal-{{device.component_id}}" data-modal-toggle="crud-modal-{{device.component_id}}" class="report-fault mb-2 block text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center" type="button">
+                                    Report Fault
+                                </button>
+                            </div>
+                            
+                        {% else %}
+                            <span class="bg-green-100 mb-2 inline-block text-green-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded dark:bg-gray-700 dark:text-green-400 border border-green-400">Device Online</span>
+                        {% endif %}
+                    {% else %}
+                        <span class="bg-red-100 mb-2 inline-block text-red-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded dark:bg-gray-700 dark:text-red-400 border border-red-400">Device Offline</span>
+                    {% endif %}
+                    <a href="/network_component/{{device.component_id}}/">
+                        <button
+                            type="button"
+                            class="py-2 px-4 bg-blue-700 hover:bg-blue-800 focus:ring-blue-500 focus:ring-offset-blue-200 text-white w-full transition ease-in duration-200 text-center text-base font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 rounded-lg">
+                            View Details
+                        </button>
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% endfor %}
+    {% else %}
+        <h1>No Data</h1>
+    {% endif %}
+</div>
+
+{% if user.is_authenticated %}
+    {% load notifications %}
+    {% notifications user %}
+{% endif %}
+
+<script type="text/javascript">
+    $(document).ready(function (e) {
+        $('.submit-fault-report').on('click', function(){
+            var form_data = new FormData();
+
+            csrf_token = $('input[name="csrfmiddlewaretoken"]').val();
+            user = $(this).siblings('input[name="user"]').val();
+            device_id = $(this).siblings('input[name="device_id"]').val();
+            device_type = $(this).siblings('input[name="device_type"]').val();
+            priority = $(this).siblings('.fault-report-form').children('.priority-block').children('.priority_val').find(':selected').val();
+            assigned_technician = $(this).siblings('.fault-report-form').children('.technician-block').children('.technician_val').find(':selected').val();
+            description = $(this).siblings('.fault-report-form').children('.description-block').children('.description_val').val();
+
+            form_data.append("csrfmiddlewaretoken", csrf_token);
+            form_data.append("user", user);
+            form_data.append("device_id", device_id);
+            form_data.append("device_type", device_type);
+            form_data.append("priority", priority);
+            form_data.append("assigned_technician", assigned_technician);
+            form_data.append("description", description);
+
+            let self = $(this)
+            self.attr({disabled: 'disabled'})
+            self.children('i').removeClass('fa-warning')
+            self.children('i').addClass('fa-spinner fa-spin')
+
+            setTimeout(() => {
+                $.ajax({
+                    url: '/report_fault/',
+                    dataType: 'json',
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    data: form_data,
+                    type: 'post',
+                    success: function (response) {
+                        self.children('i').removeClass('fa-spinner fa-spin')
+                        self.children('i').addClass('fa-check')
+                        self.children('span').text('Fault Reported')
+                        setTimeout(() => {
+                            window.location = window.location;
+                        }, 2000)
+                    },
+                    error: function (response) {
+                        console.log(response.message);
+                    }
+                })
+            }, 2000)
+            
+        })
+    });
+</script>
+
+{% endblock content %}

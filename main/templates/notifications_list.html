@@ -1,0 +1,68 @@
+{% block content %}
+{% if notification_data %}
+
+<script type="text/javascript">
+    function generate_cards(data){
+        cards = ""
+        cards += `
+        <h2 class="font-bold text-lg text-gray-400">Notifications</h2>
+        <div class="block bg-gray-100 p-2">
+        <ul role="list" class="divide-y divide-gray-200">
+        `
+        for(var i = 0; i < data.length; i++){
+            cards += `
+                <a href="/fault/${data[i].fault_id}/">
+                    <li class="p-2 sm:py-4 mb-2 rounded-md bg-white hover:bg-gray-50 hover:shadow-md transition transition-ease transition-300 border-l-2
+                        ${
+                            data[i].type == "reported" ?
+                                "border-red-500"
+                            : data[i].type == "resolution_start" ?
+                                "border-blue-500"
+                            : data[i].type == "resolution_end" ?
+                                "border-green-500"
+                            : "border-gray-100"
+                        }
+                    ">
+                        <div class="flex items-center relative">
+                            <div class="flex-1 min-w-0 ms-4">
+                                <p class="text-sm font-medium text-gray-900 wrap dark:text-white">
+                                    ${data[i].message}
+                                </p>
+                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1.5">
+                                    ${
+                                        !data[i].status ? `
+                                            <span class="bg-blue-100 text-blue-800 text-xs font-medium me-1 px-1.5 py-0.5 rounded border border-blue-400">NEW</span>
+                                            <span class="block absolute w-2.5 h-2.5 bg-green-400 rounded-full top-0 right-0"></span>
+                                        `: '<span class="bg-green-100 text-green-800 text-xs font-medium me-1 px-1.5 py-0.5 rounded border border-green-400">RESOLVED</span>'
+                                    }
+                                </p>
+                            </div>
+                            <div class="flex flex-col items-end mt-4">
+                                <time class="block mb-1 text-xs font-normal text-gray-400 sm:order-last sm:mb-0">${new Date(data[i].created_at*1000).toLocaleDateString()}</time>
+                                <time class="block mb-1 text-xs font-normal text-gray-400 sm:order-last sm:mb-0">${new Date(data[i].created_at*1000).toLocaleTimeString()}</time>
+                            </div>
+                        </div>
+                    </li>
+                </a>
+            `
+        }
+        cards += `</ul></div>`
+        return cards;
+    }
+    $(document).ready(function (e) {
+        notification_data = "{{notification_data|escapejs}}";
+        $('#notifications-panel').html(
+            generate_cards(JSON.parse(notification_data))
+        )
+    });
+</script>
+{% else %}
+<script type="text/javascript">
+    $(document).ready(function (e) {
+        $('#notifications-panel').html(
+            "No Notifications"
+        )
+    });
+</script>
+{% endif %}
+{% endblock content %}

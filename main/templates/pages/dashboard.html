@@ -1,0 +1,220 @@
+{% extends '../base.html' %}
+{% block content %}
+{% load static %}
+
+<nav
+    class="flex px-5 py-3 -mt-16 md:-mt-10 mb-2 text-gray-700 border border-gray-200 rounded-lg bg-gray-50 dark:bg-gray-800 dark:border-gray-700 mr-16 lg:mr-24 z-5 z-5"
+    aria-label="Menu">
+    <ol
+        class="inline-flex items-center space-x-1 md:space-x-2 rtl:space-x-reverse">
+		<li class="inline-flex items-center">
+            <a
+                href="/"
+                class="items-center flex justify-center text-sm font-medium text-gray-700 hover:text-blue-600 dark:text-gray-400 dark:hover:text-white">
+				<img class="w-6 h-auto inline"
+					src="{% static 'images/teleman_icon.png' %}"
+					alt="TELEMAN" />
+                <span class="ml-1 text-md font-bold">TELEMAN</span>
+            </a>
+        </li>
+        <li class="inline-flex items-center">
+            <a
+                href="/dashboard/"
+                class="items-center text-sm font-medium text-gray-700 hover:text-blue-600 dark:text-gray-400 dark:hover:text-white">
+                <i class="fas fa-home"></i>
+                Dashboard
+            </a>
+        </li>
+    </ol>
+</nav>
+
+{% if user.is_authenticated %}
+    {% load user %} {% user user %}
+{% endif %}
+
+<div class="container max-w-9xl mx-auto">
+    {% if data %}
+
+    <div class="py-2 sm:py-4">
+        <div class="mx-auto max-w-8xl px-6 lg:px-8">
+            <dl class="grid grid-cols-1 gap-6 text-center lg:grid-cols-3">
+                <div class="bg-white mx-auto flex py-4 flex-col gap-y-4 w-full rounded-lg shadow-lg">
+                    <dt class="text-base/7 text-gray-600">Total Faults</dt>
+                    <dd class="order-first text-3xl font-semibold tracking-tight text-gray-900 sm:text-5xl"><span class="text-red-600">{{ data.faults_count }}</span></dd>
+                </div>
+                <div class="bg-white mx-auto flex py-4 flex-col gap-y-4 w-full rounded-lg shadow-lg">
+                    <dt class="text-base/7 text-gray-600">Total Technicians</dt>
+                    <dd class="order-first text-3xl font-semibold tracking-tight text-gray-900 sm:text-5xl"><span class="text-yellow-600">{{ data.technicians_count }}</span></dd>
+                </div>
+                <div class="bg-white mx-auto flex py-4 flex-col gap-y-4 w-full rounded-lg shadow-lg">
+                    <dt class="text-base/7 text-gray-600">Network Locations</dt>
+                    <dd class="order-first text-3xl font-semibold tracking-tight text-gray-900 sm:text-5xl"><span class="text-blue-600">{{ data.network_locations_count }}</span></dd>
+                </div>
+                <div class="bg-white mx-auto flex py-4 flex-col items-center justify-center gap-y-4 w-full rounded-lg shadow-lg">
+                    <dt class="text-lg text-gray-600">Network Components {{ data.devices_count }}</dt>
+                    <div id="device-pie-chart"></div>
+                </div>
+                <div class="bg-white mx-auto flex py-8 flex-col gap-y-4 w-full rounded-lg shadow-lg">
+                    <dt class="text-base/7 text-gray-600">Network Locations Online</dt>
+                    <dd class="order-first text-3xl font-semibold tracking-tight text-gray-900 sm:text-5xl"><span class="text-blue-600">{{ data.network_locations_online }}</span>/{{ data.network_locations_count }}</dd>
+                    {% if data.network_locations_online == 5 %}
+                        <span class="inline-flex w-32 mx-auto justify-center items-center gap-x-1.5 py-1.5 px-3 rounded-full text-xs font-medium bg-teal-500 text-white">Health: GOOD</span>
+                    {% elif data.network_locations_online >= 4 %}
+                        <span class="inline-flex w-32 mx-auto justify-center items-center gap-x-1.5 py-3 px-3 rounded-full text-xs font-medium bg-blue-600 text-white">Health: OKAY</span>
+                    {% elif data.network_locations_online >= 3 %}
+                        <span class="inline-flex w-32 mx-auto justify-center items-center gap-x-1.5 py-1.5 px-3 rounded-full text-xs font-medium bg-white text-gray-600">Health: FAIR</span>
+                    {% else %}
+                        <span class="inline-flex w-32 mx-auto justify-center items-center gap-x-1.5 py-1.5 px-3 rounded-full text-xs font-medium bg-red-500 text-white">Health: POOR</span>
+                    {% endif %}
+                </div>
+                <div class="bg-white mx-auto flex py-4 flex-col items-center justify-center gap-y-4 w-full rounded-lg shadow-lg">
+                    <dt class="text-lg text-gray-600">Faults Reponse Metrics</dt>
+                    <div id="faults-bar-chart"></div>
+                </div>
+            </dl>
+        </div>
+    </div>
+    
+    <div class="py-2 sm:py-4">
+        <div class="mx-auto max-w-8xl px-6 lg:px-8">
+            <dl class="grid grid-cols-1 gap-6 text-center lg:grid-cols-2">
+                <div class="bg-white mx-auto flex py-2 flex-col gap-y-4 w-full rounded-lg shadow-lg">
+                    <dt class="text-lg text-gray-600">Faults Resolution Trend</dt>
+                    <div id="hs-single-area-chart"></div>
+                </div>
+                <div class="bg-white mx-auto flex py-16 flex-col items-center justify-center gap-y-4 w-full rounded-lg shadow-lg">
+                    <dt class="text-lg text-gray-600">Network Uptime Status</dt>
+                    <div id="uptime-pie-chart"></div>
+                </div>
+            </dl>
+        </div>
+    </div>
+
+    {% endif %}
+</div>
+
+<script>
+  $('document').ready(function(){
+    var resolution_faults = "{{data_network.resolution_time_faults|escapejs}}"
+    var resolution_values = "{{data_network.resolution_time_values|escapejs}}"
+    var line_options = {
+        chart: {
+            type: 'line'
+        },
+        series: [{
+            name: 'sales',
+            data: JSON.parse(resolution_values)
+        }],
+        xaxis: {
+            categories: JSON.parse(resolution_faults)
+        }
+    }
+
+    var cables_count = "{{data.cables_count}}"
+    var switches_count = "{{data.switches_count}}"
+    var routers_count = "{{data.routers_count}}"
+    var repeaters_count = "{{data.repeaters_count}}"
+    var computers_count = "{{data.computers_count}}"
+    var device_pie = {
+          series: [
+            Number(cables_count),
+            Number(switches_count),
+            Number(routers_count),
+            Number(repeaters_count),
+            Number(computers_count),
+        ],
+          chart: {
+          width: 380,
+          type: 'pie',
+        },
+        labels: ['Cables', 'Switches', 'Routers', 'Repeaters', 'Computers'],
+        responsive: [{
+          breakpoint: 480,
+          options: {
+            chart: {
+              width: 200
+            },
+            legend: {
+              position: 'bottom'
+            }
+          }
+        }]
+    };
+
+    var responded_faults = "{{data_response.responded_faults}}"
+    var total_faults = "{{data_response.total_faults}}"
+    var faults_bar = {
+          series: [{
+          data: [
+            Number(responded_faults),
+            Number(total_faults),
+            ]
+        }],
+          chart: {
+          type: 'bar',
+          height: 300,
+          width: 350,
+        },
+        plotOptions: {
+          bar: {
+            borderRadius: 4,
+            borderRadiusApplication: 'end',
+            horizontal: true,
+          }
+        },
+        dataLabels: {
+          enabled: true
+        },
+        xaxis: {
+          categories: ['Responded Faults', 'Total Faults'
+          ],
+        }
+    };
+
+    var uptime = "{{data_network_uptime.network_uptime}}"
+    var downtime = "{{data_network_uptime.total_downtime}}"
+    var uptime_pie = {
+          series: [
+            Number(uptime),
+            Number(downtime),
+        ],
+          chart: {
+          width: 380,
+          type: 'pie',
+        },
+        labels: ['Uptime', 'Downtime'],
+        responsive: [{
+          breakpoint: 480,
+          options: {
+            chart: {
+              width: 200
+            },
+            legend: {
+              position: 'bottom'
+            }
+          }
+        }]
+    };
+
+    var line_chart = new ApexCharts(document.querySelector("#hs-single-area-chart"), line_options);
+    var device_pie_chart = new ApexCharts(document.querySelector("#device-pie-chart"), device_pie);
+    var faults_bar_chart = new ApexCharts(document.querySelector("#faults-bar-chart"), faults_bar);
+    var uptime_pie_chart = new ApexCharts(document.querySelector("#uptime-pie-chart"), uptime_pie);
+
+    line_chart.render();
+    device_pie_chart.render();
+    faults_bar_chart.render();
+    uptime_pie_chart.render();
+
+  });
+</script>
+	
+</div>
+
+
+{% if user.is_authenticated %}
+    {% load notifications %}
+    {% notifications user %}
+{% endif %}
+
+{% endblock content %}

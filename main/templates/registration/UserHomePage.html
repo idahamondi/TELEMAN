@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  {% load static %}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TELEMAN</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* General Styles */
+    :root {
+      --primary-color: hwb(0 5% 3%);
+      --bg-gradient-start: hsla(192, 14%, 93%, 0.829);
+      --bg-gradient-end: hwb(200 82% 17% / 0.829);
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      animation: backgroundAnimation 1s infinite alternate;
+    }
+
+    @keyframes backgroundAnimation {
+      0% {
+        background-color: var(--bg-gradient-start);
+        background-image: linear-gradient(45deg, var(--bg-gradient-start), var(--bg-gradient-end));
+      }
+      100% {
+        background-color: var(--bg-gradient-end);
+        background-image: linear-gradient(45deg, var(--bg-gradient-end), var(--bg-gradient-start));
+      }
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      background-color: var(--primary-color);
+      color: white;
+      padding: 5px 80px;
+      border-radius: 10px;
+    }
+
+    header .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+
+    header nav a {
+      color: white;
+      font-weight: bold;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+    }
+
+    header nav a img {
+      width: 30px;
+      height: 20px;
+    }
+
+    .hero {
+      background-color: white;
+      text-align: center;
+      padding: 40px 20px;
+      border-radius: 10px;
+    }
+
+    .hero .animated-heading {
+      font-size: 2rem;
+      font-weight: bold;
+      color: solid #333;
+      display: inline-block;
+      overflow: hidden;
+      white-space: nowrap;
+      border-right: 2px solid #333;
+      animation: typingEffect 5s steps(30, end) infinite, blinkCursor 2s step-end infinite;
+    }
+
+    @keyframes typingEffect {
+      from {
+        width: 0;
+      }
+      to {
+        width: 46%;
+      }
+    }
+
+    @keyframes blinkCursor {
+      50% {
+        border-color: transparent;
+      }
+      100% {
+        border-color: #333;
+      }
+    }
+
+    .components {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-around;
+      margin: 20px;
+    }
+
+    .component {
+      text-align: center;
+      border: 2px solid #f30909;
+      padding: 20px;
+      border-radius: 10px;
+      width: 200px;
+      background-color: #f9f9f9;
+      position: relative;
+    }
+
+    .component h2 {
+      margin-bottom: 20px;
+    }
+
+    .component button {
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+
+    .component-img {
+      width: 100%;
+      height: 130px;
+      object-fit: contain;
+      margin-bottom: 15px;
+    }
+
+    .report-icon {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      width: 30px;
+      cursor: pointer;
+    }
+
+    .report-icon:hover {
+      opacity: 0.7;
+    }
+
+    footer {
+      background-color: var(--primary-color);
+      color: white;
+      text-align: center;
+      padding: 10px 0;
+    }
+
+    @media (max-width: 768px) {
+      .components {
+        flex-direction: column;
+        align-items: center;
+      }
+      .component {
+        width: 90%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">TELEMAN</div>
+    <nav>
+      <a href="#">
+        <img src="{% static 'images/dashboard-icon.png' %}" alt="Dashboard Icon">
+        Dashboard
+      </a>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <h1 class="animated-heading">Welcome to Your Network Dashboard</h1>
+  </section>
+
+  <section class="components">
+    <div class="component">
+      <img src="{% static 'images/router.png' %}" alt="Router Device Image" class="component-img">
+      <h2>Router</h2>
+      <button>View Details</button>
+      <img src="{% static 'images/report-icon.png' %}" alt="Report Issue Icon" class="report-icon">
+    </div>
+    <div class="component">
+      <img src="{% static 'images/switch.png' %}" alt="Switch Device Image" class="component-img">
+      <h2>Switch</h2>
+      <button>View Details</button>
+      <img src="{% static 'images/report-icon.png' %}" alt="Report Issue Icon" class="report-icon">
+    </div>
+    <div class="component">
+      <img src="{% static 'images/cable.png' %}" alt="Cable Device Image" class="component-img">
+      <h2>Cable</h2>
+      <button>Diagnostics</button>
+      <img src="{% static 'images/report-icon.png' %}" alt="Report Issue Icon" class="report-icon">
+    </div>
+    <div class="component">
+      <img src="{% static 'images/computer.png' %}" alt="Computer Device Image" class="component-img">
+      <h2>Computer</h2>
+      <button>Access Logs</button>
+      <img src="{% static 'images/report-icon.png' %}" alt="Report Issue Icon" class="report-icon">
+    </div>
+    <div class="component">
+      <img src="{% static 'images/generator.png' %}" alt="Power Generator Image" class="component-img">
+      <h2>Power Generator</h2>
+      <button>Energy Reports</button>
+      <img src="{% static 'images/report-icon.png' %}" alt="Report Issue Icon" class="report-icon">
+    </div>
+  </section>
+
+  <footer>
+    <p>© <span id="year"></span> Teleman System</p>
+    <script>
+      document.getElementById('year').textContent = new Date().getFullYear();
+    </script>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,28 @@
+body {
+    background-color: #efefef;
+}
+
+/* Override Rules */
+
+.login-form {
+    width: 350px;
+    border: 2px solid rgb(230, 230, 230);
+    border-radius: 5px;
+}
+
+#sidebar-menu {
+    width: 300px;
+}
+
+@media screen and (min-width: 768px) {
+    #sidebar-menu {
+        width: 450px;
+    }
+    .login-form {
+        width: 600px;
+    }
+}
+
+[id^=crud-modal] {
+    background: #00000055;
+}

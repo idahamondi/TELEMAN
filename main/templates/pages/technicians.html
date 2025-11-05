@@ -1,0 +1,85 @@
+{% extends '../base.html' %}
+{% block content %}
+{% load static %}
+
+<nav
+    class="flex px-5 py-3 -mt-16 md:-mt-10 mb-2 text-gray-700 border border-gray-200 rounded-lg bg-gray-50 dark:bg-gray-800 dark:border-gray-700 mr-16 lg:mr-24 z-5"
+    aria-label="Menu">
+    <ol
+        class="inline-flex items-center space-x-1 md:space-x-2 rtl:space-x-reverse">
+		<li class="inline-flex items-center">
+            <a
+                href="/"
+                class="items-center flex justify-center text-sm font-medium text-gray-700 hover:text-blue-600 dark:text-gray-400 dark:hover:text-white">
+				<img class="w-6 h-auto inline"
+					src="{% static 'images/teleman_icon.png' %}"
+					alt="TELEMAN" />
+                <span class="ml-1 text-md font-bold">TELEMAN</span>
+            </a>
+        </li>
+        <li class="inline-flex items-center">
+            <a
+                href="/dashboard/"
+                class="items-center text-sm font-medium text-gray-700 hover:text-blue-600 dark:text-gray-400 dark:hover:text-white">
+                <i class="fas fa-home"></i>
+                Dashboard
+            </a>
+        </li>
+        <li aria-current="page">
+            <div class="flex items-center">
+				<i class="fas fa-angle-right"></i>
+                <span
+                    class="ms-1 ml-2 text-sm font-medium text-gray-500 md:ms-2 dark:text-gray-400"
+                    >Technicians</span
+                >
+            </div>
+        </li>
+    </ol>
+</nav>
+
+{% if user.is_authenticated %}
+    {% load user %} {% user user %}
+{% endif %}
+
+<div class="container max-w-9xl mx-auto">
+    <h1 class="text-2xl font-bold text-center mb-4 my-4 text-xl font-extrabold text-gray-900 md:text-2xl lg:text-3xl">TECHNICIANS</h1>
+    {% if data %}
+
+    <div class="py-2 sm:py-4">
+        <div class="mx-auto max-w-8xl px-6 lg:px-8">
+            <dl class="grid grid-cols-1 gap-6 md:grid-cols-3 lg:grid-cols-3">
+                {% for technician in data %}
+                <div class="bg-white mx-auto flex py-8 px-4 flex-col gap-y-4 w-full rounded-lg shadow-lg">
+                    <p class="font-bold">{{ technician.name }}</p>
+                    {% if technician.availability %}
+                      <div class="inline-flex items-center">
+                        <span class="w-4 h-4 mr-2 inline-block bg-green-500 rounded-full me-2"></span>
+                        <span class="text-gray-600 dark:text-neutral-400">Available</span>
+                      </div>
+                    {% else %}
+                    <div class="inline-flex items-center">
+                        <span class="w-4 h-4 mr-2 inline-block bg-red-500 rounded-full me-2"></span>
+                        <span class="text-gray-600 dark:text-neutral-400">Unavailable</span>
+                      </div>
+                    {% endif %}
+                    <div class="bg-gray-100 rounded-md p-3 w-content rounded-lg">
+                        <span class="font-normal text-gray-500">Skillset:</span>
+                        {% for skill in technician.skillset %}
+                            <p class="font-bold italic">{{ skill }}</p>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endfor %}
+            </dl>
+        </div>
+    </div>
+    
+    {% endif %}
+</div>
+
+{% if user.is_authenticated %}
+    {% load notifications %}
+    {% notifications user %}
+{% endif %}
+
+{% endblock content %}
